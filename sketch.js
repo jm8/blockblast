@@ -2,11 +2,11 @@ let windowWidth = window.innerWidth;
 let windowHeight = window.innerHeight;
 let canvas;
 
-const cellSize = 40;
+const cellSize = Math.min(windowWidth, windowHeight) / 12;
 const gridSize = cellSize * 8;
 const gridWeight = 2;
 const gridX = (windowWidth - gridSize) / 2;
-const gridY = 20;
+const gridY = cellSize / 2;
 
 const board = [];
 for (let i = 0; i < 8; i++) {
@@ -162,9 +162,9 @@ const allEmptyCells = (list) => {
 }
 
 let activeOption = null;
-const optionDx = 120;
+const optionDx = cellSize * 2.75;
 const optionXs = [windowWidth / 2 - optionDx, windowWidth / 2, windowWidth / 2 + optionDx];
-const optionsY = windowHeight - 80;
+const optionsY = cellSize * 9 + cellSize * 5 / 4;
 
 let colorIndex;
 const randomPieceOption = () => {

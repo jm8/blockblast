@@ -189,6 +189,30 @@ setup = () => {
   ];
 }
 
+const getFullColumns = () => {
+  const result = [];
+  for (let col = 0; col < 8; col++) {
+    let full = true;
+    for (let row = 0; row < 8; row++) {
+      if (board[row][col] === null) { full = false }
+    }
+    if (full) result.push(col);
+  }
+  return result;
+}
+
+const getFullRows = () => {
+  const result = [];
+  for (let row = 0; row < 8; row++) {
+    let full = true;
+    for (let col = 0; col < 8; col++) {
+      if (board[row][col] === null) { full = false; }
+    }
+    if (full) result.push(row);
+  }
+  return result;
+}
+
 const update = () => {
   if (activeOption !== null && !mouseIsPressed) {
     const hoveredCells = getHoveredCells(pieceOptions[activeOption].shapeId, mouseX, mouseY);
@@ -197,6 +221,18 @@ const update = () => {
         board[row][col] = pieceOptions[activeOption].color
       }
       pieceOptions[activeOption].used = true;
+    }
+    const fullRows = getFullRows();
+    const fullColumns = getFullColumns();
+    for (const row of fullRows) {
+      for (let col = 0; col < 8; col++) {
+        board[row][col] = null;
+      }
+    }
+    for (const col of fullColumns) {
+      for (let row = 0; row < 8; row++) {
+        board[row][col] = null;
+      }
     }
     activeOption = null;
     let allUsed = true;
@@ -225,11 +261,6 @@ draw = () => {
   update();
   background(bgColor);
 
-  for (let i = 0; i < 8; i++) {
-    for (let j = 0; j < 8; j++) {
-      drawGridCell(i, j, board[i][j]);
-    }
-  }
 
   for (let i = 0; i < pieceOptions.length; i++) {
     push();
@@ -243,16 +274,42 @@ draw = () => {
 
   if (activeOption !== null) {
     const hoveredCells = getHoveredCells(pieceOptions[activeOption].shapeId, mouseX, mouseY);
+    let iAddedCellsToTestTheFullness = false;
     if (allEmptyCells(hoveredCells)) {
+      iAddedCellsToTestTheFullness = true;
       for (const [row, col] of hoveredCells) {
         drawGridCell(row, col, pieceOptions[activeOption].color, true);
+        board[row][col] = pieceOptions[activeOption].color;
+      }
+    }
+    const fullColumns = getFullColumns();
+    const fullRows = getFullRows();
+    for (let i = 0; i < 8; i++) {
+      for (let j = 0; j < 8; j++) {
+        if ((fullRows.includes(i) || fullColumns.includes(j))) {
+          drawGridCell(i, j, pieceOptions[activeOption].color);
+        } else {
+          drawGridCell(i, j, board[i][j]);
+        }
+      }
+    }
+    if (iAddedCellsToTestTheFullness) {
+      for (const [row, col] of hoveredCells) {
+        board[row][col] = null;
       }
     }
     push();
     translate(mouseX, mouseY);
     drawPiece(pieceOptions[activeOption].shapeId, pieceOptions[activeOption].color);
     pop();
+  } else {
+    for (let i = 0; i < 8; i++) {
+      for (let j = 0; j < 8; j++) {
+        drawGridCell(i, j, board[i][j]);
+      }
+    }
   }
+
 
   stroke(gridColor);
 }
